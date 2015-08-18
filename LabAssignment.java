@@ -21,7 +21,12 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
-
+/**
+ * This class was made for the Purdue University Computer Science Bridge Course for assigning students randomly to 
+ * different lab sections. To use, a roster must be provided in CSV format with a column for the students' first names
+ * and a column for the students' last names. There should be no column headers but any extra columns are allowed but 
+ * not necessary.
+ */
 public class LabAssignment extends JFrame {
 
 	/**
@@ -32,8 +37,8 @@ public class LabAssignment extends JFrame {
 	private String labOneName;
 	private String labTwoName;
 	private String labThreeName;
-	private int firstNameCol = 1;
-	private int lastNameCol = 0;
+	private int firstNameCol;
+	private int lastNameCol;
 	private File rosterFile;
 	private ArrayList<String> nameList;
 	
@@ -45,10 +50,22 @@ public class LabAssignment extends JFrame {
 	private JTable table;
 	private JScrollPane scrollPane;
 	
+	/**
+	 * Creates a new LabAssignment object with the first column defaulted as the students' last names and the second 
+	 * column defaulted as the students' first names. Initializes and shows a form for entering lab room numbers, 
+	 * specifying the column indices for first and last names, and selecting the .csv file containing the roster of 
+	 * student names.
+	 */
 	public LabAssignment() {
+		firstNameCol = 1;
+		lastNameCol = 0;
 		showInitializeView();
 	}
 
+	/**
+	 * Shows the lab assignments of students with lab room locations as column headers. Windows has a button which 
+	 * will reassign the students randomly across the lab sections and repopulate the table with the new assignment.
+	 */
 	private void showTableView() {
 		nameList = getStudentNameList(rosterFile, firstNameCol, lastNameCol);
 		columnNames = new String[]{labOneName, labTwoName, labThreeName};
@@ -85,6 +102,9 @@ public class LabAssignment extends JFrame {
 		this.setVisible(true);
 	}
 	
+	/**
+	 * Randomly assigns the students from the supplied roster to a lab section.
+	 */
 	private void assignLabs() {
 		// Create deep copy of nameList
 		ArrayList<String> tempList = new ArrayList<String>();
@@ -95,7 +115,10 @@ public class LabAssignment extends JFrame {
 		Random r = new Random();
 		int dataRowIndex = 0;
 		while (tempList.size() > 0) {
+			// Assign one random student to each of the three lab sections.
 			for (int i = 0; i < 3; i++) {
+				// Pick a random student, specified by index in the list of student names,
+				// remove them from the list, and add them to the table data matrix.
 				data[dataRowIndex][i] = tempList.remove(r.nextInt(tempList.size()));
 			}
 			dataRowIndex++;
@@ -105,12 +128,16 @@ public class LabAssignment extends JFrame {
 		sortData(1);
 		sortData(2);
 		
+		// Must remove rows from the table and re-add in order for changes to update in the displayed table.
 		model.setRowCount(0);
 		for (int i = 0; i < data.length; i++) {
 			model.insertRow(i, data[i]);
 		}
 	}
 	
+	/**
+	 * Sorts the specified column from the data matrix containing students names lexicographically.
+	 */
 	private void sortData(int column) {
 		boolean swapped = false;
 		while (!swapped) {
@@ -126,6 +153,10 @@ public class LabAssignment extends JFrame {
 		}
 	}
 
+	/**
+	 * Sets up and displays the form for entering lab room locations, first and last name column indices, and 
+	 * selecting the .csv file containing the roster of students' names.
+	 */
 	private void showInitializeView() {
 		JFrame frame = new JFrame();
 		JPanel panel = new JPanel(new GridLayout(0, 1));
@@ -194,6 +225,9 @@ public class LabAssignment extends JFrame {
 		frame.setVisible(true);
 	}
 
+	/**
+	 * Parses the csv file, extracting and storing the students' first and last names.
+	 */
 	public ArrayList<String> getStudentNameList(File csv, int firstNameCol, int lastNameCol) {
 		ArrayList<String> nameList = new ArrayList<String>();
 		try {
@@ -213,6 +247,7 @@ public class LabAssignment extends JFrame {
 	}
 
 	public static void main(String[] args) throws Exception {
+		// Set the LookAndFeel of the UI to Nimbus or use the default if it is not found.
 		try {
 			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
 				if ("Nimbus".equals(info.getName())) {

@@ -1,0 +1,7 @@
+Author: Neil Allison
+
+To use LabAssignment, you can either package the source into an executable Jar or use the included executable Jar. You should repackage it if you make any modifications to the source.
+
+When you run the Jar, a window will show up allowing you to enter the lab room locations (these will become the column headers in the final table), select the .csv file containing the roster of students' names, and specify the column indices of the students' first and last names from your roster. It is important to note the following:
+  - There should be NO column headers in your .csv roster.
+  - The column indices start indexing at 0 (the first column) so make sure you enter the correct values for first and last name columns.
