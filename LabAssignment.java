@@ -116,7 +116,9 @@ public class LabAssignment extends JFrame {
 		int dataRowIndex = 0;
 		while (tempList.size() > 0) {
 			// Assign one random student to each of the three lab sections.
-			for (int i = 0; i < 3; i++) {
+			// Change bound to handle uneven lab sections
+			int upperBound = Math.min(3, tempList.size());
+			for (int i = 0; i < upperBound; i++) {
 				// Pick a random student, specified by index in the list of student names,
 				// remove them from the list, and add them to the table data matrix.
 				data[dataRowIndex][i] = tempList.remove(r.nextInt(tempList.size()));
@@ -139,10 +141,12 @@ public class LabAssignment extends JFrame {
 	 * Sorts the specified column from the data matrix containing students names lexicographically.
 	 */
 	private void sortData(int column) {
+		// Change bound to handle uneven lab sections
+		int upperBound = (column == 0 || nameList.size() % 3 == 0) ? data.length - 1 : data.length - 2;
 		boolean swapped = false;
 		while (!swapped) {
 			swapped = true;
-			for (int i = 0; i < data.length - 1; i++) {
+			for (int i = 0; i < upperBound; i++) {
 				if (data[i][column].toString().compareTo(data[i + 1][column].toString()) > 0) {
 					Object temp = data[i][column];
 					data[i][column] = data[i + 1][column];
