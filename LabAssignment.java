@@ -39,8 +39,9 @@ public class LabAssignment extends JFrame {
 	private String labThreeName;
 	private int firstNameCol;
 	private int lastNameCol;
+	private int numStudents;
 	private File rosterFile;
-	private ArrayList<String> nameList;
+	private String[] nameList;
 	
 	private String[] columnNames;
 	private Object[][] data;
@@ -59,6 +60,7 @@ public class LabAssignment extends JFrame {
 	public LabAssignment() {
 		firstNameCol = 1;
 		lastNameCol = 0;
+		numStudents = 0;
 		showInitializeView();
 	}
 
@@ -106,26 +108,24 @@ public class LabAssignment extends JFrame {
 	 * Randomly assigns the students from the supplied roster to a lab section.
 	 */
 	private void assignLabs() {
-		// Create deep copy of nameList
-		ArrayList<String> tempList = new ArrayList<String>();
-		tempList.addAll(nameList);
-		
-		data = new Object[(int)Math.ceil(tempList.size() / 3.0)][3];
-		
+		// Shuffle students' names in nameList
 		Random r = new Random();
-		int dataRowIndex = 0;
-		while (tempList.size() > 0) {
-			// Assign one random student to each of the three lab sections.
-			// Change bound to handle uneven lab sections
-			int upperBound = Math.min(3, tempList.size());
-			for (int i = 0; i < upperBound; i++) {
-				// Pick a random student, specified by index in the list of student names,
-				// remove them from the list, and add them to the table data matrix.
-				data[dataRowIndex][i] = tempList.remove(r.nextInt(tempList.size()));
-			}
-			dataRowIndex++;
+		for (int i = numStudents - 1; i >= 0; i--) {
+			int randIndex = r.nextInt(numStudents);
+			String tempName = nameList[randIndex];
+			nameList[randIndex] = nameList[i];
+			nameList[i] = tempName;
 		}
 		
+		// Initialize Object array to store student names for table model
+		data = new Object[(int)Math.ceil(numStudents / 3.0)][3];
+		
+		// Copy students' names into table data model
+		for (int i = 0; i < numStudents; i++) {
+			data[i / 3][i % 3] = nameList[i];
+		}
+		
+		// Sort each column
 		sortData(0);
 		sortData(1);
 		sortData(2);
@@ -142,7 +142,7 @@ public class LabAssignment extends JFrame {
 	 */
 	private void sortData(int column) {
 		// Change bound to handle uneven lab sections
-		int upperBound = (column == 0 || nameList.size() % 3 == 0) ? data.length - 1 : data.length - 2;
+		int upperBound = (column == 0 || numStudents % 3 == 0) ? data.length - 1 : data.length - 2;
 		boolean swapped = false;
 		while (!swapped) {
 			swapped = true;
@@ -232,7 +232,7 @@ public class LabAssignment extends JFrame {
 	/**
 	 * Parses the csv file, extracting and storing the students' first and last names.
 	 */
-	public ArrayList<String> getStudentNameList(File csv, int firstNameCol, int lastNameCol) {
+	public String[] getStudentNameList(File csv, int firstNameCol, int lastNameCol) {
 		ArrayList<String> nameList = new ArrayList<String>();
 		try {
 			Scanner s = new Scanner(csv);
@@ -246,8 +246,14 @@ public class LabAssignment extends JFrame {
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
 		}
-
-		return nameList;
+		
+		numStudents = nameList.size();
+		String[] tempNames = new String[numStudents];
+		for (int i = 0; i < numStudents; i++) {
+			tempNames[i] = nameList.get(i);
+		}
+		
+		return tempNames;
 	}
 
 	public static void main(String[] args) throws Exception {
